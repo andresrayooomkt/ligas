@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#14110E">
+<title>Quiniela Apertura 2026 — Simulador Liga MX</title>
+<meta name="description" content="Simula el Apertura 2026 de la Liga MX con el calendario oficial: 17 jornadas, sedes, horarios, tabla general y liguilla.">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E9E6DF;--paper-2:#DFDBD2;--ink:#14110E;--ink-soft:#5C564D;
+  --rule:#C3BDB1;--red:#BE1622;--green:#1F5F3E;--stamp:#B8342B;
+  --grain:rgba(20,17,14,.022);
+  --campo:#FFFFFF;
+  --bar-bg:#14110E;--bar-fg:#E9E6DF;
+  --bar-fg-40:rgba(233,230,223,.40);
+  --bar-fg-55:rgba(233,230,223,.55);
+  --bar-fg-60:rgba(233,230,223,.60);
+  --bar-fg-70:rgba(233,230,223,.70);
+  --f-display:'Anton',system-ui,sans-serif;
+  --f-body:'Archivo',system-ui,sans-serif;
+  --f-data:'Roboto Mono',ui-monospace,monospace;
+  --max:940px;
+}
+[data-tema="oscuro"]{
+  --paper:#15130F;--paper-2:#1F1C17;--ink:#EDEAE2;--ink-soft:#9C9486;
+  --rule:#3B362E;--red:#E8505C;--green:#4FA97C;--stamp:#D96A5E;
+  --grain:rgba(237,234,226,.026);
+  --campo:#242019;
+  --bar-bg:#231F19;--bar-fg:#EDEAE2;
+  --bar-fg-40:rgba(237,234,226,.40);
+  --bar-fg-55:rgba(237,234,226,.58);
+  --bar-fg-60:rgba(237,234,226,.62);
+  --bar-fg-70:rgba(237,234,226,.72);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);
+  font-size:15px;line-height:1.45;
+  background-image:repeating-linear-gradient(0deg,var(--grain) 0 1px,transparent 1px 3px)}
+:focus-visible{outline:2.5px solid var(--red);outline-offset:2px}
+
+.tricolor{height:6px;background:linear-gradient(90deg,
+  #006847 0 33.333%,#FBFAF7 33.333% 66.666%,#CE1126 66.666% 100%)}
+.masthead{border-bottom:3px solid var(--ink)}
+.masthead-inner{max-width:var(--max);margin:0 auto;padding:20px 16px 14px}
+.eyebrow{font-family:var(--f-data);font-size:.63rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ink-soft);display:flex;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding-bottom:7px;margin-bottom:10px}
+h1{font-family:var(--f-display);font-size:clamp(2.6rem,11vw,5.4rem);
+  line-height:.84;letter-spacing:-.015em;text-transform:uppercase}
+h1 .in-red{color:var(--red)}
+.deck{margin-top:9px;font-size:.9rem;max-width:46ch;color:var(--ink-soft)}
+.tema{font-family:var(--f-data);font-size:.58rem;letter-spacing:.14em;
+  text-transform:uppercase;background:none;border:1px solid var(--rule);
+  color:var(--ink-soft);padding:4px 10px;cursor:pointer;order:3;
+  transition:border-color .15s,color .15s}
+.tema:hover{border-color:var(--ink);color:var(--ink)}
+
+.toolbar{position:sticky;top:0;z-index:50;background:var(--bar-bg);color:var(--bar-fg);
+  border-bottom:3px solid var(--red)}
+.toolbar-inner{max-width:var(--max);margin:0 auto;padding:9px 16px;display:flex;
+  gap:16px;align-items:center;overflow-x:auto;scrollbar-width:none}
+.toolbar-inner::-webkit-scrollbar{display:none}
+.tabs{display:flex;gap:2px;flex-shrink:0}
+.tab{font-family:var(--f-display);text-transform:uppercase;font-size:.86rem;
+  letter-spacing:.05em;background:none;border:0;color:var(--bar-fg-55);
+  padding:6px 11px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px}
+.tab:hover{color:var(--bar-fg)}
+.tab[aria-selected="true"]{color:var(--bar-fg);border-bottom-color:var(--red)}
+.tools{display:flex;gap:7px;margin-left:auto;flex-shrink:0}
+.btn{font-family:var(--f-body);font-weight:600;font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.06em;background:none;border:1.5px solid var(--bar-fg-40);
+  color:var(--bar-fg);padding:6px 11px;cursor:pointer;white-space:nowrap;
+  transition:background .15s,color .15s,border-color .15s}
+.btn:hover{background:var(--bar-fg);color:var(--bar-bg);border-color:var(--bar-fg)}
+.btn:disabled{opacity:.45;cursor:wait}
+.btn-red{border-color:var(--red);background:var(--red)}
+.btn-red:hover{background:var(--bar-fg);color:var(--red);border-color:var(--bar-fg)}
+
+main{max-width:var(--max);margin:0 auto;padding:22px 16px 70px}
+.section-head{display:flex;align-items:baseline;gap:11px;border-bottom:2px solid var(--ink);
+  padding-bottom:5px;margin:26px 0 13px}
+.section-head:first-child{margin-top:0}
+.section-head h2{font-family:var(--f-display);text-transform:uppercase;font-size:1.5rem;line-height:1}
+.section-head .note{font-family:var(--f-data);font-size:.64rem;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink-soft);margin-left:auto;text-align:right}
+
+.aviso{border:2px dashed var(--rule);padding:10px 12px;margin-bottom:18px;
+  font-family:var(--f-data);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-soft);line-height:1.6}
+.aviso strong{color:var(--red)}
+
+.progress{display:flex;border:2px solid var(--ink);margin-bottom:20px;flex-wrap:wrap}
+.pcell{flex:1 1 0;min-width:82px;padding:9px 11px;border-right:1px solid var(--rule)}
+.pcell:last-child{border-right:0}
+.pcell .v{font-family:var(--f-display);font-size:1.5rem;line-height:1}
+.pcell .k{font-family:var(--f-data);font-size:.58rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ink-soft);margin-top:2px}
+
+.chip{display:inline-block;width:15px;height:15px;flex-shrink:0;
+  border:1px solid var(--ink);vertical-align:-2px;margin-right:8px}
+.chip-lg{width:19px;height:19px}
+
+.standings{width:100%;border-collapse:collapse;font-family:var(--f-data);font-size:.8rem}
+.standings th{font-size:.58rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-soft);font-weight:400;text-align:right;padding:5px;border-bottom:1.5px solid var(--ink)}
+.standings th:nth-child(1),.standings th:nth-child(2){text-align:left}
+.standings td{padding:6px 5px;text-align:right;border-bottom:1px solid var(--rule)}
+.standings td:nth-child(1){text-align:left;width:26px;color:var(--ink-soft)}
+.standings td:nth-child(2){text-align:left;font-family:var(--f-body);font-weight:600;
+  font-size:.86rem;white-space:nowrap}
+.standings td.pts{font-weight:700}
+.standings tr.liguilla td:nth-child(1){color:#FBFAF7;background:var(--green);
+  font-weight:700;text-align:center}
+.legend{font-family:var(--f-data);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-soft);margin-top:9px;display:flex;align-items:center;gap:6px}
+.swatch{width:11px;height:11px;background:var(--green);display:inline-block}
+
+.jornada-nav{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:16px}
+.jbtn{font-family:var(--f-data);font-size:.72rem;font-weight:700;width:32px;height:32px;
+  border:1.5px solid var(--rule);background:transparent;color:var(--ink-soft);cursor:pointer}
+.jbtn:hover{border-color:var(--ink);color:var(--ink)}
+.jbtn[aria-current="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.jbtn.done{border-color:var(--green);color:var(--green)}
+.jbtn.done[aria-current="true"]{background:var(--green);color:var(--paper);border-color:var(--green)}
+
+.slip{border:2px solid var(--ink);background:var(--paper);margin-bottom:-2px;
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px 8px;
+  padding:9px 12px;position:relative}
+.slip.filled{background:var(--paper-2)}
+.ficha{grid-column:1/-1;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  font-family:var(--f-data);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-soft);padding-bottom:6px;border-bottom:1px dotted var(--rule);margin-bottom:2px}
+.slip .side{font-weight:600;font-size:.95rem;display:flex;align-items:center;min-width:0}
+.slip .side.away{flex-direction:row-reverse;text-align:right}
+.slip .side.away .chip{margin-right:0;margin-left:8px}
+.slip .side .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slip .side.win .name{color:var(--red)}
+.boxes{display:flex;align-items:center;gap:5px}
+.sbox{width:38px;height:38px;border:2px solid var(--ink);background:var(--paper);
+  font-family:var(--f-data);font-size:1.15rem;font-weight:700;text-align:center;
+  color:var(--ink);-moz-appearance:textfield}
+.sbox::-webkit-outer-spin-button,.sbox::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.sbox:focus{background:var(--campo)}
+.dash{font-family:var(--f-data);color:var(--ink-soft)}
+.score-final{font-family:var(--f-data);font-size:1.3rem;font-weight:700;letter-spacing:.06em;padding:0 4px}
+.slip-actions{grid-column:1/-1;display:flex;gap:7px;justify-content:center;
+  padding-top:7px;border-top:1px dashed var(--rule);margin-top:3px}
+.mini{font-family:var(--f-data);font-size:.6rem;letter-spacing:.11em;text-transform:uppercase;
+  background:none;border:1px solid var(--rule);color:var(--ink-soft);padding:3px 9px;cursor:pointer}
+.mini:hover{border-color:var(--red);color:var(--red)}
+.tagline{position:absolute;top:-2px;right:-2px;font-family:var(--f-data);font-size:.52rem;
+  letter-spacing:.13em;padding:2px 5px;text-transform:uppercase}
+.tag-sim{background:var(--ink);color:var(--paper)}
+.tag-man,.tag-real,.tag-sim{color:var(--paper)}
+.tag-man{background:var(--stamp);color:var(--paper)}
+.tag-real{background:var(--green);color:var(--paper)}
+
+.tie{border:2px solid var(--ink);padding:12px;margin-bottom:11px}
+.tie-head{font-family:var(--f-data);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink-soft);margin-bottom:7px;display:flex;justify-content:space-between;gap:8px}
+.tie-row{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:3px 0;font-size:.95rem}
+.tie-row .seed{font-family:var(--f-data);font-size:.68rem;color:var(--ink-soft);
+  min-width:18px;display:inline-block}
+.tie-row.adv{font-weight:700;color:var(--red)}
+.agg{font-family:var(--f-data);font-weight:700}
+.tie-note{font-family:var(--f-data);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-soft);margin-top:6px;padding-top:6px;border-top:1px dashed var(--rule)}
+.empty{border:2px dashed var(--rule);padding:26px 16px;text-align:center;
+  color:var(--ink-soft);font-size:.9rem}
+
+.champion{border:3px solid var(--ink);margin-top:24px;padding:30px 20px;text-align:center;
+  background:var(--bar-bg);color:var(--bar-fg)}
+.champion .label{font-family:var(--f-data);font-size:.62rem;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--bar-fg-60)}
+.champion .name{font-family:var(--f-display);text-transform:uppercase;
+  font-size:clamp(2.2rem,9vw,4rem);line-height:.92;margin:7px 0;color:var(--bar-fg)}
+.champion .sub{font-size:.85rem;color:var(--bar-fg-70)}
+.champion .chip{border-color:var(--bar-fg);width:26px;height:26px;margin:0 auto 6px;display:block}
+
+footer{border-top:2px solid var(--ink);margin-top:40px;padding:18px 16px 30px}
+.footer-inner{max-width:var(--max);margin:0 auto;font-family:var(--f-data);font-size:.6rem;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);line-height:1.7}
+
+/* nombre largo por defecto, corto solo en pantallas chicas */
+.n-corto{display:none}
+
+@media(max-width:640px){
+  .n-largo{display:none}
+  .n-corto{display:inline}
+
+  body{font-size:16px}
+
+  /* cabecera mas baja: el contenido importa mas que el titulo */
+  .masthead-inner{padding:14px 14px 11px}
+  h1{font-size:2.2rem}
+  .deck{display:none}
+  .eyebrow{font-size:.55rem;letter-spacing:.14em;align-items:center}
+  #eyebrow-formato{display:none}
+  .tema{min-height:34px;padding:6px 11px;font-size:.55rem}
+
+  main{padding:16px 12px 96px}
+
+  /* acciones al pie: alcanzables con el pulgar, siempre visibles */
+  .toolbar-inner{padding:0 12px;gap:0}
+  .tabs{width:100%}
+  .tab{flex:1;text-align:center;padding:13px 4px;font-size:.92rem}
+  .tools{position:fixed;left:0;right:0;bottom:0;margin:0;z-index:60;
+    background:var(--bar-bg);border-top:2px solid var(--red);
+    display:flex;gap:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+  .tools .btn{flex:1;min-height:44px;font-size:.7rem;padding:6px 4px;
+    border-width:1.5px;margin:0 3px}
+
+  /* tabla: fuera las columnas que nadie lee en el celular */
+  .standings th:nth-child(4),.standings td:nth-child(4),
+  .standings th:nth-child(5),.standings td:nth-child(5),
+  .standings th:nth-child(6),.standings td:nth-child(6),
+  .standings th:nth-child(7),.standings td:nth-child(7),
+  .standings th:nth-child(8),.standings td:nth-child(8){display:none}
+  .standings td{padding:9px 4px}
+  .standings td:nth-child(2){font-size:.92rem}
+  .standings td:nth-child(1){width:30px}
+
+  .progress{flex-wrap:nowrap}
+  .pcell{min-width:0;padding:8px 6px}
+  .pcell .v{font-size:1.25rem}
+  .pcell .k{font-size:.5rem;letter-spacing:.08em}
+
+  /* jornadas: una sola fila que se desliza, sin tres renglones de botones */
+  .jornada-nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;
+    scroll-snap-type:x proximity;gap:5px;padding-bottom:4px;margin:0 -12px 14px;
+    padding-left:12px;padding-right:12px}
+  .jornada-nav::-webkit-scrollbar{display:none}
+  .jbtn{width:44px;height:44px;flex-shrink:0;scroll-snap-align:center;font-size:.85rem}
+
+  /* el partido NO se apila: local, marcador y visita en una linea */
+  .slip{grid-template-columns:1fr auto 1fr;gap:6px;padding:10px 10px}
+  .slip .side{font-size:.94rem;gap:0}
+  .slip .side.away{flex-direction:row-reverse;text-align:right}
+  .slip .side.away .chip{margin-right:0;margin-left:7px}
+  .slip .side .chip{margin-right:7px}
+  .ficha{font-size:.55rem;letter-spacing:.06em;gap:6px}
+
+  /* marcadores: 46px, por encima del minimo tactil */
+  .sbox{width:46px;height:46px;font-size:1.25rem}
+  .score-final{font-size:1.25rem;text-align:center}
+  .slip-actions{gap:6px}
+  .mini{padding:8px 12px;font-size:.62rem;min-height:36px}
+
+  .tie{padding:11px 10px}
+  .tie-head{font-size:.53rem;letter-spacing:.08em}
+  .champion{padding:26px 14px}
+}
+
+@media(max-width:380px){
+  .slip .side{font-size:.86rem}
+  .sbox{width:42px;height:42px}
+  .tools .btn{font-size:.62rem}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="tricolor" role="img" aria-label="México"></div>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="eyebrow"><span id="eyebrow-torneo">—</span>
+      <button id="btn-tema" class="tema" type="button" aria-pressed="false">Modo oscuro</button>
+      <span id="eyebrow-formato">—</span></div>
+    <h1>Tu <span class="in-red">quiniela</span><br>del torneo</h1>
+    <p class="deck">Llena la fase regular a mano o déjasela al motor. La tabla se recalcula al instante y la liguilla se arma sola.</p>
+  </div>
+</header>
+
+<nav class="toolbar">
+  <div class="toolbar-inner">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-view="tabla" aria-selected="true">Tabla</button>
+      <button class="tab" role="tab" data-view="jornadas" aria-selected="false">Jornadas</button>
+      <button class="tab" role="tab" data-view="liguilla" aria-selected="false">Liguilla</button>
+    </div>
+    <div class="tools">
+      <button class="btn" id="btn-sync">Actualizar</button>
+      <button class="btn" id="btn-jornada"><span class="n-largo">Simular jornada</span><span class="n-corto">Jornada</span></button>
+      <button class="btn btn-red" id="btn-todo"><span class="n-largo">Simular todo</span><span class="n-corto">Todo</span></button>
+      <button class="btn" id="btn-reset">Borrar</button>
+    </div>
+  </div>
+</nav>
+
+<main id="app"></main>
+
+<footer>
+  <div class="footer-inner">
+    <p>Simulador independiente sin relación con la Liga BBVA MX, la FMF ni ningún club. Los colores identifican a cada equipo; no se usan escudos ni marcas registradas.</p>
+    <p style="margin-top:8px">Tus predicciones se guardan en este navegador. Nadie más las ve.</p>
+  </div>
+</footer>
+
+<script>
+"use strict";
+
+/* ╔══════════════════════════════════════════════════════════╗
+   ║  BLOQUE A — TORNEO                                       ║
+   ║  Lo único que se cambia cada 4 o 5 meses.                ║
+   ╚══════════════════════════════════════════════════════════╝ */
+const TORNEO = {
+  id:"ap2026",
+  liga:"Liga BBVA MX",
+  nombre:"Apertura 2026",
+  jornadas:17,
+  clasificados:8,
+  golesPromedio:2.9,
+  ventajaLocal:1.12,
+  zonaHoraria:"America/Mexico_City",
+
+  clubes:[
+    {id:"AME", nombre:"América",           rating:84, color1:"#002B5C", color2:"#FFD100", corto:"América"},
+    {id:"TOL", nombre:"Toluca",            rating:82, color1:"#DA291C", corte:"solido", corto:"Toluca"},
+    {id:"CAZ", nombre:"Cruz Azul",         rating:80, color1:"#003DA5", color2:"#F4F2ED", corto:"Cruz Azul"},
+    {id:"MTY", nombre:"Monterrey",         rating:80, color1:"#00205B", color2:"#F4F2ED", corto:"Rayados"},
+    {id:"TIG", nombre:"Tigres UANL",       rating:78, color1:"#FFB81C", color2:"#003087", corto:"Tigres"},
+    {id:"GDL", nombre:"Guadalajara",       rating:76, color1:"#C8102E", color2:"#F4F2ED", corto:"Chivas"},
+    {id:"PUM", nombre:"Pumas UNAM",        rating:74, color1:"#00234B", color2:"#C99700", corto:"Pumas"},
+    {id:"TIJ", nombre:"Tijuana",           rating:74, color1:"#E4002B", color2:"#1A1A1A", corto:"Xolos"},
+    {id:"PAC", nombre:"Pachuca",           rating:74, color1:"#003DA5", color2:"#F4F2ED", corto:"Pachuca"},
+    {id:"LEO", nombre:"León",              rating:72, color1:"#007A33", color2:"#F4F2ED", corto:"León"},
+    {id:"NEC", nombre:"Necaxa",            rating:72, color1:"#F4F2ED", color2:"#E4002B", corte:"horizontal", corto:"Necaxa"},
+    {id:"ATL", nombre:"Atlas",             rating:70, color1:"#C8102E", color2:"#1A1A1A", corto:"Atlas"},
+    {id:"ASL", nombre:"Atlético San Luis", rating:68, color1:"#0F3B8C", color2:"#D9A520", corto:"San Luis"},
+    {id:"PUE", nombre:"Puebla",            rating:66, color1:"#003087", color2:"#F4F2ED", corto:"Puebla"},
+    {id:"QRO", nombre:"Querétaro",         rating:66, color1:"#13294B", color2:"#1A1A1A", corto:"Querétaro"},
+    {id:"SAN", nombre:"Santos Laguna",     rating:64, color1:"#00693C", color2:"#F4F2ED", corto:"Santos"},
+    {id:"JUA", nombre:"FC Juárez",         rating:64, color1:"#006341", color2:"#1A1A1A", corto:"Juárez"},
+    {id:"ATE", nombre:"Atlante",           rating:62, color1:"#003DA5", color2:"#C8102E", corto:"Atlante"}
+  ],
+
+  liguilla:{rondas:[
+    {id:"CF", nombre:"Cuartos de final", equipos:8, desempateSiembra:true},
+    {id:"SF", nombre:"Semifinales",      equipos:4, desempateSiembra:true},
+    {id:"FI", nombre:"Final",            equipos:2, desempateSiembra:false}
+  ]}
+};
+
+/* ╔══════════════════════════════════════════════════════════╗
+   ║  BLOQUE B — CALENDARIO OFICIAL                           ║
+   ║                                                          ║
+   ║  Tres formas de llenarlo, en orden de preferencia:       ║
+   ║                                                          ║
+   ║  1. Automática — botón "Actualizar". Trae calendario Y   ║
+   ║     marcadores del proveedor y los guarda. Es la vía     ║
+   ║     recomendada: al estrenar torneo no tecleas nada.     ║
+   ║                                                          ║
+   ║  2. Manual — pega aquí el arreglo. Una entrada por       ║
+   ║     partido, con jornada empezando en 1:                 ║
+   ║       {jornada:1, local:"AME", visita:"QRO",             ║
+   ║        fecha:"2026-07-18", hora:"21:00",                 ║
+   ║        sede:"Estadio Ciudad de los Deportes",            ║
+   ║        ciudad:"CDMX"}                                    ║
+   ║                                                          ║
+   ║  3. Ninguna — el programa genera un round-robin válido   ║
+   ║     en estructura, con la advertencia visible arriba.    ║
+   ╚══════════════════════════════════════════════════════════╝ */
+let CALENDARIO_OFICIAL = [];
+
+/* ╔══════════════════════════════════════════════════════════╗
+   ║  BLOQUE C — PROVEEDOR DE DATOS                           ║
+   ║  Armado para TheSportsDB. Para cambiar de proveedor      ║
+   ║  sólo se reescribe normalizar(): debe devolver           ║
+   ║  [{jornada, local, visita, fecha, hora, sede, ciudad,    ║
+   ║    gl, gv}] con nuestros ids. gl/gv en null si el        ║
+   ║  partido aún no se juega. Nada más se entera.            ║
+   ╚══════════════════════════════════════════════════════════╝ */
+const FUENTE = {
+  activa:true,
+  llave:"123",   // llave publica de prueba: TOPE DE 15 EVENTOS
+  ligaId:"4350",
+  temporada:"2026-2027",
+
+  url(){
+    return "https://www.thesportsdb.com/api/v1/json/" + this.llave +
+           "/eventsseason.php?id=" + this.ligaId + "&s=" + this.temporada;
+  },
+
+  alias:{
+    "Club America":"AME","America":"AME","Club Leon":"LEO","Leon":"LEO",
+    "Guadalajara Chivas":"GDL","CD Guadalajara":"GDL","Chivas":"GDL",
+    "UNAM Pumas":"PUM","Pumas UNAM":"PUM","Tigres UANL":"TIG",
+    "Atl. San Luis":"ASL","Atletico San Luis":"ASL",
+    "Atletico de San Luis":"ASL","Atlético de San Luis":"ASL","Club Tijuana":"TIJ",
+    "Tijuana":"TIJ","Juarez":"JUA","FC Juarez":"JUA","Queretaro":"QRO",
+    "Santos Laguna":"SAN","Cruz Azul":"CAZ","Monterrey":"MTY","Atlas":"ATL",
+    "Toluca":"TOL","Pachuca":"PAC","Necaxa":"NEC","Puebla":"PUE","Atlante":"ATE"
+  },
+
+  normalizar(json){
+    const eventos = (json && json.events) || [];
+    const salida = [];
+    eventos.forEach(e => {
+      const local = this.aId(e.strHomeTeam), visita = this.aId(e.strAwayTeam);
+      if (!local || !visita) return;
+      const jornada = parseInt(e.intRound, 10);
+      if (!jornada || jornada < 1 || jornada > TORNEO.jornadas) return;  // fuera: liguilla o amistosos
+      const marcado = e.intHomeScore !== null && e.intHomeScore !== undefined &&
+                      e.intAwayScore !== null && e.intAwayScore !== undefined;
+      salida.push({
+        jornada, local, visita,
+        // dateEvent y strTime vienen en UTC; los *Local son la hora de cancha
+        fecha: e.dateEventLocal || e.dateEvent || "",
+        hora:  (e.strTimeLocal || e.strTime || "").slice(0, 5),
+        sede:  e.strVenue || "",
+        ciudad:"",                       // el proveedor no manda ciudad, solo pais
+        pospuesto: e.strPostponed === "yes",
+        gl: marcado ? +e.intHomeScore : null,
+        gv: marcado ? +e.intAwayScore : null
+      });
+    });
+    return salida;
+  },
+
+  aId(n){
+    if (!n) return null;
+    if (this.alias[n]) return this.alias[n];
+    const limpio = norm(n);
+    for (const k in this.alias) if (norm(k) === limpio) return this.alias[k];
+    const c = TORNEO.clubes.find(x => norm(x.nombre) === limpio);
+    return c ? c.id : null;
+  }
+};
+
+const norm = s => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+                           .toLowerCase().replace(/[^a-z0-9]/g,"");
+
+/* ══════════════════════════════════════════════════════════
+   PERSISTENCIA
+   ══════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════
+   TEMA — la preferencia vive fuera del torneo, así sobrevive
+   cuando se estrena Clausura y cambia la clave de guardado.
+   ══════════════════════════════════════════════════════════ */
+const CLAVE_TEMA = "quiniela_tema";
+
+function temaGuardado(){
+  try{ return localStorage.getItem(CLAVE_TEMA); }catch(e){ return null; }
+}
+function temaInicial(){
+  const g = temaGuardado();
+  if (g === "claro" || g === "oscuro") return g;
+  // primera visita: seguir lo que el teléfono ya tiene puesto
+  return window.matchMedia &&
+         window.matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro";
+}
+function aplicarTema(t){
+  document.documentElement.setAttribute("data-tema", t);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", t === "oscuro" ? "#231F19" : "#14110E");
+  const btn = document.getElementById("btn-tema");
+  if (btn){
+    btn.textContent = t === "oscuro" ? "Modo claro" : "Modo oscuro";
+    btn.setAttribute("aria-pressed", t === "oscuro");
+  }
+}
+function alternarTema(){
+  const nuevo = document.documentElement.getAttribute("data-tema") === "oscuro"
+              ? "claro" : "oscuro";
+  try{ localStorage.setItem(CLAVE_TEMA, nuevo); }catch(e){}
+  aplicarTema(nuevo);
+}
+aplicarTema(temaInicial());
+
+// si el usuario nunca eligió, seguir al sistema cuando cambie
+if (window.matchMedia){
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ev => {
+    if (!temaGuardado()) aplicarTema(ev.matches ? "oscuro" : "claro");
+  });
+}
+
+const CLAVE = "quiniela_" + TORNEO.id;
+const almacen = {
+  leer(){ try{ const r = localStorage.getItem(CLAVE); return r ? JSON.parse(r) : null; }
+          catch(e){ return null; } },
+  escribir(d){ try{ localStorage.setItem(CLAVE, JSON.stringify(d)); }catch(e){} },
+  borrar(){ try{ localStorage.removeItem(CLAVE); }catch(e){} }
+};
+
+/* ══════════════════════════════════════════════════════════
+   ESTADO
+   ══════════════════════════════════════════════════════════ */
+let estado = {
+  vista:"tabla", jornadaActiva:0,
+  resultados:{}, series:{},
+  calendario:[],        // [[{local,visita,fecha,hora,sede,ciudad}]]
+  oficial:false,        // ¿el calendario viene del proveedor o pegado a mano?
+  sincronizado:null,
+  parcial:false, traidos:0
+};
+
+const club   = id => TORNEO.clubes.find(c => c.id === id);
+const nombre = id => club(id) ? club(id).nombre : "—";
+const corto  = id => club(id) ? (club(id).corto || club(id).nombre) : "—";
+const idPartido = (j, i) => "J" + j + "-" + i;
+const totalPartidos = () => estado.calendario.reduce((s, r) => s + r.length, 0);
+
+function chip(id, grande){
+  const c = club(id); if (!c) return "";
+  let fondo;
+  if (c.corte === "solido" || !c.color2){
+    fondo = c.color1;
+  } else if (c.corte === "horizontal"){
+    fondo = `linear-gradient(180deg,${c.color1} 50%,${c.color2} 50%)`;
+  } else if (c.corte === "vertical"){
+    fondo = `linear-gradient(90deg,${c.color1} 50%,${c.color2} 50%)`;
+  } else {
+    fondo = `linear-gradient(135deg,${c.color1} 50%,${c.color2} 50%)`;
+  }
+  return `<span class="chip ${grande ? "chip-lg" : ""}" aria-hidden="true"
+    style="background:${fondo}"></span>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CALENDARIO
+   ══════════════════════════════════════════════════════════ */
+function calendarioGenerado(){
+  const ids = TORNEO.clubes.map(c => c.id), n = ids.length, fijo = ids[0];
+  let giro = ids.slice(1); const jornadas = [];
+  for (let j = 0; j < n - 1; j++){
+    const ronda = [], orden = [fijo, ...giro];
+    for (let i = 0; i < n / 2; i++){
+      const a = orden[i], b = orden[n - 1 - i];
+      const par = (j + i) % 2 === 0 ? {local:a, visita:b} : {local:b, visita:a};
+      ronda.push({...par, fecha:"", hora:"", sede:"", ciudad:""});
+    }
+    jornadas.push(ronda);
+    giro = [giro[giro.length - 1], ...giro.slice(0, -1)];
+  }
+  return jornadas.slice(0, TORNEO.jornadas);
+}
+
+// Convierte una lista plana de partidos en jornadas ordenadas por fecha
+function agruparEnJornadas(lista){
+  const jornadas = Array.from({length:TORNEO.jornadas}, () => []);
+  lista.forEach(p => {
+    if (p.jornada >= 1 && p.jornada <= TORNEO.jornadas)
+      jornadas[p.jornada - 1].push({
+        local:p.local, visita:p.visita, fecha:p.fecha || "",
+        hora:p.hora || "", sede:p.sede || "", ciudad:p.ciudad || ""
+      });
+  });
+  jornadas.forEach(r => r.sort((a, b) =>
+    (a.fecha + a.hora).localeCompare(b.fecha + b.hora)));
+  return jornadas;
+}
+
+function construirCalendario(){
+  const g = almacen.leer();
+  if (g && g.calendario && g.calendario.length){
+    estado.calendario = g.calendario;
+    estado.oficial = !!g.oficial;
+    estado.sincronizado = g.sincronizado || null;
+    estado.parcial = !!g.parcial; estado.traidos = g.traidos || 0;
+  } else if (CALENDARIO_OFICIAL.length){
+    estado.calendario = agruparEnJornadas(CALENDARIO_OFICIAL);
+    estado.oficial = true;
+  } else {
+    estado.calendario = calendarioGenerado();
+    estado.oficial = false;
+  }
+  if (g && g.resultados){
+    estado.resultados = g.resultados;
+    estado.series = g.series || {};
+    estado.jornadaActiva = g.jornadaActiva || 0;
+  }
+}
+
+function guardar(){
+  almacen.escribir({
+    resultados:estado.resultados, series:estado.series,
+    jornadaActiva:estado.jornadaActiva, calendario:estado.calendario,
+    oficial:estado.oficial, sincronizado:estado.sincronizado,
+    parcial:estado.parcial, traidos:estado.traidos
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOTOR — Poisson
+   ══════════════════════════════════════════════════════════ */
+function poisson(l){ const L = Math.exp(-l); let k = 0, p = 1;
+  do { k++; p *= Math.random(); } while (p > L); return k - 1; }
+
+function simularPartido(idL, idV){
+  const base = TORNEO.golesPromedio / 2;
+  const brecha = (club(idL).rating - club(idV).rating) / 22;
+  return {
+    gl:poisson(Math.min(4.6, Math.max(.25, base * Math.exp(brecha * .5) * TORNEO.ventajaLocal))),
+    gv:poisson(Math.min(4.6, Math.max(.25, base * Math.exp(-brecha * .5)))),
+    origen:"sim"
+  };
+}
+
+/* ══════════════════════════════════════════════════════════
+   TABLA Y LIGUILLA
+   ══════════════════════════════════════════════════════════ */
+function tablaGeneral(){
+  const f = {};
+  TORNEO.clubes.forEach(c => f[c.id] = {id:c.id, jj:0, g:0, e:0, p:0, gf:0, gc:0, dg:0, pts:0});
+  estado.calendario.forEach((ronda, j) => ronda.forEach((pt, i) => {
+    const r = estado.resultados[idPartido(j, i)]; if (!r) return;
+    const L = f[pt.local], V = f[pt.visita]; if (!L || !V) return;
+    L.jj++; V.jj++; L.gf += r.gl; L.gc += r.gv; V.gf += r.gv; V.gc += r.gl;
+    if (r.gl > r.gv){ L.g++; V.p++; L.pts += 3; }
+    else if (r.gl < r.gv){ V.g++; L.p++; V.pts += 3; }
+    else { L.e++; V.e++; L.pts++; V.pts++; }
+  }));
+  const lista = Object.values(f);
+  lista.forEach(x => x.dg = x.gf - x.gc);
+  lista.sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf
+                       || nombre(a.id).localeCompare(nombre(b.id)));
+  return lista;
+}
+const completa = () => totalPartidos() > 0 &&
+  Object.keys(estado.resultados).length >= totalPartidos();
+
+function emparejar(eq){
+  const o = eq.slice().sort((a, b) => a.pos - b.pos), pares = [];
+  for (let i = 0; i < o.length / 2; i++) pares.push({alto:o[i], bajo:o[o.length - 1 - i]});
+  return pares;
+}
+function jugarSerie(id, alto, bajo, siembra){
+  if (estado.series[id]) return estado.series[id];
+  const ida = simularPartido(bajo.id, alto.id), vta = simularPartido(alto.id, bajo.id);
+  const gAlto = ida.gv + vta.gl, gBajo = ida.gl + vta.gv;
+  let ganador, via;
+  if (gAlto !== gBajo){ ganador = gAlto > gBajo ? alto.id : bajo.id; via = "global"; }
+  else if (siembra){ ganador = alto.id; via = "siembra"; }
+  else { const fz = club(alto.id).rating / (club(alto.id).rating + club(bajo.id).rating);
+         ganador = Math.random() < fz ? alto.id : bajo.id; via = "penales"; }
+  return estado.series[id] = {alto:alto.id, bajo:bajo.id, posAlto:alto.pos, posBajo:bajo.pos,
+    ida:[ida.gl, ida.gv], vuelta:[vta.gl, vta.gv], gAlto, gBajo, ganador, via};
+}
+function correrLiguilla(){
+  if (!completa()) return null;
+  const rondas = [];
+  let vivos = tablaGeneral().slice(0, TORNEO.clasificados).map((f, i) => ({id:f.id, pos:i + 1}));
+  for (const cfg of TORNEO.liguilla.rondas){
+    if (vivos.length < cfg.equipos) break;
+    const series = emparejar(vivos).map((par, i) =>
+      jugarSerie(cfg.id + i, par.alto, par.bajo, cfg.desempateSiembra));
+    rondas.push({cfg, series});
+    vivos = series.map(s => ({id:s.ganador, pos:s.ganador === s.alto ? s.posAlto : s.posBajo}));
+  }
+  return {rondas, campeon: vivos.length === 1 ? vivos[0].id : null};
+}
+
+/* ══════════════════════════════════════════════════════════
+   ACCIONES
+   ══════════════════════════════════════════════════════════ */
+const invalidar = () => estado.series = {};
+
+function simularJornada(j){
+  estado.calendario[j].forEach((pt, i) => {
+    const k = idPartido(j, i);
+    if (!estado.resultados[k]) estado.resultados[k] = simularPartido(pt.local, pt.visita);
+  });
+  invalidar(); guardar(); pintar();
+}
+function simularTodo(){
+  estado.calendario.forEach((ronda, j) => ronda.forEach((pt, i) => {
+    const k = idPartido(j, i);
+    if (!estado.resultados[k]) estado.resultados[k] = simularPartido(pt.local, pt.visita);
+  }));
+  correrLiguilla(); guardar(); pintar();
+}
+function anotar(j, i){
+  const l = document.getElementById("gl-" + j + "-" + i);
+  const v = document.getElementById("gv-" + j + "-" + i);
+  if (!l || !v) return;
+  estado.resultados[idPartido(j, i)] = {
+    gl:Math.max(0, Math.min(20, parseInt(l.value, 10) || 0)),
+    gv:Math.max(0, Math.min(20, parseInt(v.value, 10) || 0)), origen:"manual"};
+  invalidar(); guardar(); pintar();
+}
+function reiniciar(){
+  if (!confirm("Se borran tus predicciones y la liguilla. El calendario se conserva. ¿Continuar?")) return;
+  estado.resultados = {}; estado.series = {}; estado.jornadaActiva = 0;
+  guardar(); pintar();
+}
+
+/* Trae calendario Y marcadores en una sola llamada.
+   Los marcadores reales pisan al motor, pero NO pisan lo que
+   el usuario anotó a mano: su quiniela es suya. */
+async function sincronizar(){
+  const btn = document.getElementById("btn-sync");
+  if (!FUENTE.activa){
+    alert("Activa el bloque C del código y pon tu llave del proveedor.");
+    return;
+  }
+  const etiqueta = btn.textContent;
+  btn.disabled = true; btn.textContent = "Actualizando…";
+  try{
+    const resp = await fetch(FUENTE.url(), {cache:"no-store"});
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    const lista = FUENTE.normalizar(await resp.json());
+    if (!lista.length) throw new Error("sin partidos");
+
+    const nuevo = agruparEnJornadas(lista);
+
+    // Reubica lo que el usuario ya había anotado: el calendario
+    // cambió de forma, así que sus marcadores se buscan por par
+    // de equipos, no por índice.
+    const mios = {};
+    estado.calendario.forEach((ronda, j) => ronda.forEach((pt, i) => {
+      const r = estado.resultados[idPartido(j, i)];
+      if (r && r.origen === "manual") mios[[pt.local, pt.visita].sort().join("|")] = r;
+    }));
+
+    estado.calendario = nuevo;
+    estado.oficial = true;
+    estado.sincronizado = new Date().toISOString();
+    estado.resultados = {};
+
+    let reales = 0, recuperados = 0;
+    nuevo.forEach((ronda, j) => ronda.forEach((pt, i) => {
+      const llave = [pt.local, pt.visita].sort().join("|");
+      const dato = lista.find(p =>
+        [p.local, p.visita].sort().join("|") === llave && p.jornada === j + 1);
+      if (mios[llave]){ estado.resultados[idPartido(j, i)] = mios[llave]; recuperados++; return; }
+      if (dato && dato.gl !== null){
+        const mismoLocal = pt.local === dato.local;
+        estado.resultados[idPartido(j, i)] = {
+          gl: mismoLocal ? dato.gl : dato.gv,
+          gv: mismoLocal ? dato.gv : dato.gl, origen:"real"};
+        reales++;
+      }
+    }));
+
+    // El plan gratuito trunca la respuesta: si faltan jornadas, avisalo
+    const esperados = TORNEO.jornadas * (TORNEO.clubes.length / 2);
+    estado.parcial = lista.length < esperados;
+    estado.traidos = lista.length;
+
+    invalidar(); guardar(); pintar();
+    btn.textContent = "✓ " + reales + " jugados";
+    if (recuperados) console.info("Predicciones tuyas conservadas:", recuperados);
+  }catch(err){
+    console.error("sincronizar:", err);
+    btn.textContent = "No se pudo";
+  }finally{
+    setTimeout(() => { btn.disabled = false; btn.textContent = etiqueta; }, 2600);
+  }
+}
+
+function compartir(t){
+  if (navigator.share) navigator.share({text:t}).catch(() => {});
+  else if (navigator.clipboard) navigator.clipboard.writeText(t)
+    .then(() => alert("Copiado al portapapeles"));
+}
+
+/* ══════════════════════════════════════════════════════════
+   FORMATO DE FECHA
+   ══════════════════════════════════════════════════════════ */
+const DIAS  = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+
+function fechaLarga(iso){
+  if (!iso) return "";
+  const p = iso.split("-");
+  if (p.length !== 3) return iso;
+  const d = new Date(+p[0], +p[1] - 1, +p[2]);
+  if (isNaN(d)) return iso;
+  return DIAS[d.getDay()] + " " + (+p[2]) + " " + MESES[+p[1] - 1];
+}
+
+function rangoJornada(ronda){
+  const fechas = ronda.map(p => p.fecha).filter(Boolean).sort();
+  if (!fechas.length) return "";
+  const a = fechaLarga(fechas[0]), b = fechaLarga(fechas[fechas.length - 1]);
+  return a === b ? a : a + " – " + b;
+}
+
+/* ══════════════════════════════════════════════════════════
+   VISTAS
+   ══════════════════════════════════════════════════════════ */
+const esc = s => String(s).replace(/[&<>"']/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function avisoCalendario(){
+  if (estado.oficial && estado.parcial){
+    const esperados = TORNEO.jornadas * (TORNEO.clubes.length / 2);
+    return `<div class="aviso"><strong>Calendario incompleto.</strong>
+      El proveedor devolvió ${estado.traidos} de ${esperados} partidos.
+      La llave gratuita corta la respuesta a 15 eventos; se necesita llave dedicada
+      para el torneo completo.</div>`;
+  }
+  if (estado.oficial) return "";
+  return `<div class="aviso"><strong>Calendario provisional.</strong>
+    Los emparejamientos son válidos en estructura pero no son los oficiales,
+    y faltan sedes y horarios. Usa Actualizar o pega el calendario en el bloque B.</div>`;
+}
+
+function vistaTabla(){
+  const t = tablaGeneral(), total = totalPartidos();
+  const n = Object.keys(estado.resultados).length;
+  const goles = Object.values(estado.resultados).reduce((s, r) => s + r.gl + r.gv, 0);
+  const mios = Object.values(estado.resultados).filter(r => r.origen === "manual").length;
+
+  let h = avisoCalendario() + `<div class="progress">
+    <div class="pcell"><div class="v">${n}<span style="font-size:.85rem;color:var(--ink-soft)">/${total}</span></div><div class="k">Partidos</div></div>
+    <div class="pcell"><div class="v">${goles}</div><div class="k">Goles</div></div>
+    <div class="pcell"><div class="v">${n ? (goles / n).toFixed(2) : "—"}</div><div class="k">Por juego</div></div>
+    <div class="pcell"><div class="v">${mios}</div><div class="k">Tuyos</div></div>
+  </div>
+  <div class="section-head"><h2>Tabla general</h2>
+    <span class="note">Puntos · Diferencia · A favor</span></div>
+  <table class="standings"><thead><tr>
+    <th>#</th><th>Club</th><th>JJ</th><th>G</th><th>E</th><th>P</th>
+    <th>GF</th><th>GC</th><th>DIF</th><th>PTS</th></tr></thead><tbody>`;
+
+  t.forEach((f, i) => {
+    h += `<tr class="${i < TORNEO.clasificados ? "liguilla" : ""}">
+      <td>${i + 1}</td><td>${chip(f.id)}<span class="n-largo">${esc(nombre(f.id))}</span><span class="n-corto">${esc(corto(f.id))}</span></td>
+      <td>${f.jj}</td><td>${f.g}</td><td>${f.e}</td><td>${f.p}</td>
+      <td>${f.gf}</td><td>${f.gc}</td>
+      <td>${f.dg > 0 ? "+" : ""}${f.dg}</td><td class="pts">${f.pts}</td></tr>`;
+  });
+  return h + `</tbody></table>
+  <p class="legend"><span class="swatch"></span> Clasifican directo a la liguilla</p>`;
+}
+
+function vistaJornadas(){
+  const j = estado.jornadaActiva, ronda = estado.calendario[j] || [];
+  let h = avisoCalendario() + `<div class="jornada-nav">`;
+  estado.calendario.forEach((r, idx) => {
+    const lista = r.length && r.every((_, i) => estado.resultados[idPartido(idx, i)]);
+    h += `<button class="jbtn ${lista ? "done" : ""}" data-jornada="${idx}"
+      aria-current="${idx === j}">${idx + 1}</button>`;
+  });
+  const rango = rangoJornada(ronda);
+  h += `</div><div class="section-head"><h2>Jornada ${j + 1}</h2>
+    <span class="note">${ronda.length} partidos${rango ? " · " + esc(rango) : ""}</span></div>`;
+
+  ronda.forEach((pt, i) => {
+    const r = estado.resultados[idPartido(j, i)];
+    const gL = r && r.gl > r.gv, gV = r && r.gv > r.gl;
+    const et = r ? (r.origen === "manual" ? ["tag-man","Tuyo"]
+                  : r.origen === "real" ? ["tag-real","Real"] : ["tag-sim","Motor"]) : null;
+
+    h += `<div class="slip ${r ? "filled" : ""}">`;
+    if (et) h += `<span class="tagline ${et[0]}">${et[1]}</span>`;
+
+    if (pt.fecha || pt.sede){
+      const izq = [fechaLarga(pt.fecha), pt.hora].filter(Boolean).join(" · ");
+      const der = [pt.sede, pt.ciudad].filter(Boolean).join(", ");
+      h += `<div class="ficha"><span>${esc(izq)}</span><span>${esc(der)}</span></div>`;
+    }
+
+    h += `<div class="side ${gL ? "win" : ""}">${chip(pt.local)}<span class="name n-largo">${esc(nombre(pt.local))}</span><span class="name n-corto">${esc(corto(pt.local))}</span></div>`;
+    if (r) h += `<div class="score-final">${r.gl} – ${r.gv}</div>`;
+    else h += `<div class="boxes">
+      <input class="sbox" type="number" min="0" max="20" inputmode="numeric"
+        id="gl-${j}-${i}" data-anotar="${j}-${i}" aria-label="Goles ${esc(nombre(pt.local))}">
+      <span class="dash">–</span>
+      <input class="sbox" type="number" min="0" max="20" inputmode="numeric"
+        id="gv-${j}-${i}" data-anotar="${j}-${i}" aria-label="Goles ${esc(nombre(pt.visita))}">
+      </div>`;
+    h += `<div class="side away ${gV ? "win" : ""}">${chip(pt.visita)}<span class="name n-largo">${esc(nombre(pt.visita))}</span><span class="name n-corto">${esc(corto(pt.visita))}</span></div>`;
+
+    h += `<div class="slip-actions">`;
+    h += r ? `<button class="mini" data-borrar="${j}-${i}">Cambiar</button>`
+           : `<button class="mini" data-guardar="${j}-${i}">Anotar</button>
+              <button class="mini" data-tirar="${j}-${i}">Que decida el motor</button>`;
+    h += `</div></div>`;
+  });
+  return h;
+}
+
+function vistaLiguilla(){
+  if (!completa()){
+    const faltan = totalPartidos() - Object.keys(estado.resultados).length;
+    return `<div class="section-head"><h2>Liguilla</h2></div>
+      <div class="empty">Faltan <strong>${faltan}</strong> partidos de la fase regular.<br>
+      La liguilla se arma cuando la tabla esté cerrada.</div>`;
+  }
+  const res = correrLiguilla(); let h = "";
+  res.rondas.forEach(ronda => {
+    h += `<div class="section-head"><h2>${esc(ronda.cfg.nombre)}</h2></div>`;
+    ronda.series.forEach(s => {
+      const arriba = s.ganador === s.alto;
+      h += `<div class="tie">
+        <div class="tie-head"><span>Ida en ${esc(nombre(s.bajo))} · vuelta en ${esc(nombre(s.alto))}</span><span>Global</span></div>
+        <div class="tie-row ${arriba ? "adv" : ""}">
+          <span><span class="seed">${s.posAlto}</span>${chip(s.alto)}<span class="n-largo">${esc(nombre(s.alto))}</span><span class="n-corto">${esc(corto(s.alto))}</span></span>
+          <span class="agg">${s.gAlto}</span></div>
+        <div class="tie-row ${!arriba ? "adv" : ""}">
+          <span><span class="seed">${s.posBajo}</span>${chip(s.bajo)}<span class="n-largo">${esc(nombre(s.bajo))}</span><span class="n-corto">${esc(corto(s.bajo))}</span></span>
+          <span class="agg">${s.gBajo}</span></div>
+        <div class="tie-note">Ida ${s.ida[0]}–${s.ida[1]} · Vuelta ${s.vuelta[0]}–${s.vuelta[1]}
+          ${s.via === "siembra" ? " · avanza por mejor posición" : ""}
+          ${s.via === "penales" ? " · definida en penales" : ""}</div></div>`;
+    });
+  });
+  if (res.campeon){
+    const txt = nombre(res.campeon) + " campeón del " + TORNEO.nombre + " en mi quiniela. ¿Cuál es la tuya?";
+    h += `<div class="champion">${chip(res.campeon, true)}
+      <div class="label">Campeón · ${esc(TORNEO.nombre)}</div>
+      <div class="name">${esc(nombre(res.campeon))}</div>
+      <div class="sub">Tu quiniela quedó cerrada.</div>
+      <button class="btn" style="margin-top:16px" id="btn-compartir" data-texto="${esc(txt)}">Compartir</button>
+    </div>`;
+  }
+  return h;
+}
+
+/* ══════════════════════════════════════════════════════════
+   RENDER
+   ══════════════════════════════════════════════════════════ */
+function pintar(){
+  const app = document.getElementById("app");
+  app.innerHTML = estado.vista === "tabla" ? vistaTabla()
+                : estado.vista === "jornadas" ? vistaJornadas()
+                : vistaLiguilla();
+  document.querySelectorAll(".tab").forEach(t =>
+    t.setAttribute("aria-selected", t.dataset.view === estado.vista));
+  document.getElementById("btn-jornada").style.display =
+    estado.vista === "jornadas" ? "" : "none";
+  document.getElementById("btn-sync").style.display = FUENTE.activa ? "" : "none";
+
+  // deja visible la jornada activa dentro del deslizador
+  const activa = document.querySelector('.jbtn[aria-current="true"]');
+  if (activa && activa.scrollIntoView)
+    activa.scrollIntoView({block:"nearest", inline:"center"});
+}
+
+aplicarTema(document.documentElement.getAttribute("data-tema"));
+construirCalendario();
+
+document.getElementById("eyebrow-torneo").textContent = TORNEO.liga + " · " + TORNEO.nombre;
+document.getElementById("eyebrow-formato").textContent =
+  TORNEO.clubes.length + " clubes · " + TORNEO.jornadas + " jornadas · " +
+  TORNEO.clasificados + " a liguilla";
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.view){ estado.vista = t.dataset.view; pintar(); return; }
+  if (t.dataset.jornada !== undefined){
+    estado.jornadaActiva = +t.dataset.jornada; guardar(); pintar(); return; }
+  if (t.dataset.guardar){ const [j, i] = t.dataset.guardar.split("-").map(Number); return anotar(j, i); }
+  if (t.dataset.tirar){
+    const [j, i] = t.dataset.tirar.split("-").map(Number), p = estado.calendario[j][i];
+    estado.resultados[idPartido(j, i)] = simularPartido(p.local, p.visita);
+    invalidar(); guardar(); return pintar(); }
+  if (t.dataset.borrar){
+    const [j, i] = t.dataset.borrar.split("-").map(Number);
+    delete estado.resultados[idPartido(j, i)];
+    invalidar(); guardar(); return pintar(); }
+  if (t.id === "btn-tema")      return alternarTema();
+  if (t.id === "btn-todo")      return simularTodo();
+  if (t.id === "btn-reset")     return reiniciar();
+  if (t.id === "btn-jornada")   return simularJornada(estado.jornadaActiva);
+  if (t.id === "btn-sync")      return sincronizar();
+  if (t.id === "btn-compartir") return compartir(t.dataset.texto);
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.dataset && e.target.dataset.anotar){
+    const [j, i] = e.target.dataset.anotar.split("-").map(Number); anotar(j, i);
+  }
+});
+
+pintar();
+</script>
+</body>
+</html>
