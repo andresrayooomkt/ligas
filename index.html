@@ -324,6 +324,9 @@ const TORNEO = {
   id:"ap2026",
   liga:"Liga BBVA MX",
   nombre:"Apertura 2026",
+  // súbele cuando corrijas el BLOQUE B: los navegadores que guardaron
+  // la versión anterior tiran su copia y adoptan la nueva
+  calendarioVersion:2,
   jornadas:17,
   clasificados:8,
   golesPromedio:2.9,
@@ -377,7 +380,161 @@ const TORNEO = {
    ║  3. Ninguna — el programa genera un round-robin válido   ║
    ║     en estructura, con la advertencia visible arriba.    ║
    ╚══════════════════════════════════════════════════════════╝ */
-let CALENDARIO_OFICIAL = [];
+let CALENDARIO_OFICIAL = [
+  {"jornada":1,"local":"NEC","visita":"ATE","fecha":"2026-07-16","hora":"20:00","sede":"Estadio Victoria","ciudad":""},
+  {"jornada":1,"local":"TIJ","visita":"TIG","fecha":"2026-07-16","hora":"20:10","sede":"Estadio Caliente","ciudad":""},
+  {"jornada":1,"local":"LEO","visita":"ATL","fecha":"2026-07-17","hora":"20:00","sede":"Estadio León","ciudad":""},
+  {"jornada":1,"local":"ASL","visita":"CAZ","fecha":"2026-07-17","hora":"20:00","sede":"Estadio Alfonso Lastras Ramírez","ciudad":""},
+  {"jornada":1,"local":"JUA","visita":"PUE","fecha":"2026-07-17","hora":"21:00","sede":"Estadio Olímpico Benito Juárez","ciudad":""},
+  {"jornada":1,"local":"PUM","visita":"PAC","fecha":"2026-07-18","hora":"18:00","sede":"Estadio Olímpico Universitario","ciudad":""},
+  {"jornada":1,"local":"MTY","visita":"SAN","fecha":"2026-07-18","hora":"20:05","sede":"Estadio BBVA","ciudad":""},
+  {"jornada":1,"local":"GDL","visita":"TOL","fecha":"2026-07-18","hora":"20:07","sede":"Estadio Akron","ciudad":""},
+  {"jornada":1,"local":"QRO","visita":"AME","fecha":"2026-07-18","hora":"22:10","sede":"Estadio La Corregidora","ciudad":""},
+  {"jornada":2,"local":"CAZ","visita":"PUE","fecha":"2026-07-21","hora":"20:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":2,"local":"TOL","visita":"PUM","fecha":"2026-07-21","hora":"22:05","sede":"Estadio Nemesio Díez","ciudad":""},
+  {"jornada":2,"local":"TIJ","visita":"LEO","fecha":"2026-07-24","hora":"20:00","sede":"Estadio Caliente","ciudad":""},
+  {"jornada":2,"local":"ATE","visita":"AME","fecha":"2026-07-24","hora":"22:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":2,"local":"GDL","visita":"JUA","fecha":"2026-07-25","hora":"18:07","sede":"Estadio Akron","ciudad":""},
+  {"jornada":2,"local":"TIG","visita":"ASL","fecha":"2026-07-25","hora":"22:00","sede":"Estadio Universitario UANL","ciudad":""},
+  {"jornada":2,"local":"SAN","visita":"ATL","fecha":"2026-07-25","hora":"22:00","sede":"Estadio Corona","ciudad":""},
+  {"jornada":2,"local":"NEC","visita":"MTY","fecha":"2026-07-26","hora":"18:00","sede":"Estadio Victoria","ciudad":""},
+  {"jornada":2,"local":"PAC","visita":"QRO","fecha":"2026-07-26","hora":"20:06","sede":"Estadio Hidalgo","ciudad":""},
+  {"jornada":3,"local":"PUE","visita":"GDL","fecha":"2026-07-31","hora":"20:00","sede":"Estadio Cuauhtémoc","ciudad":""},
+  {"jornada":3,"local":"ASL","visita":"TIJ","fecha":"2026-07-31","hora":"22:00","sede":"Estadio Alfonso Lastras Ramírez","ciudad":""},
+  {"jornada":3,"local":"JUA","visita":"PUM","fecha":"2026-08-01","hora":"15:00","sede":"Estadio Olímpico Benito Juárez","ciudad":""},
+  {"jornada":3,"local":"QRO","visita":"TIG","fecha":"2026-08-01","hora":"18:00","sede":"Estadio La Corregidora","ciudad":""},
+  {"jornada":3,"local":"LEO","visita":"PAC","fecha":"2026-08-01","hora":"20:00","sede":"Estadio León","ciudad":""},
+  {"jornada":3,"local":"ATL","visita":"MTY","fecha":"2026-08-01","hora":"20:05","sede":"Estadio Jalisco","ciudad":""},
+  {"jornada":3,"local":"CAZ","visita":"ATE","fecha":"2026-08-01","hora":"22:05","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":3,"local":"AME","visita":"SAN","fecha":"2026-08-02","hora":"18:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":3,"local":"TOL","visita":"NEC","fecha":"2026-08-02","hora":"20:05","sede":"Estadio Nemesio Díez","ciudad":""},
+  {"jornada":4,"local":"ATE","visita":"TOL","fecha":"2026-08-15","hora":"18:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":4,"local":"MTY","visita":"JUA","fecha":"2026-08-15","hora":"20:00","sede":"Estadio BBVA","ciudad":""},
+  {"jornada":4,"local":"ATL","visita":"TIG","fecha":"2026-08-15","hora":"22:00","sede":"Estadio Jalisco","ciudad":""},
+  {"jornada":4,"local":"PUM","visita":"QRO","fecha":"2026-08-16","hora":"13:00","sede":"Estadio Olímpico Universitario","ciudad":""},
+  {"jornada":4,"local":"AME","visita":"ASL","fecha":"2026-08-16","hora":"18:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":4,"local":"TIJ","visita":"CAZ","fecha":"2026-08-16","hora":"20:00","sede":"Estadio Caliente","ciudad":""},
+  {"jornada":4,"local":"SAN","visita":"GDL","fecha":"2026-08-16","hora":"20:10","sede":"Estadio Corona","ciudad":""},
+  {"jornada":4,"local":"NEC","visita":"LEO","fecha":"2026-08-17","hora":"20:00","sede":"Estadio Victoria","ciudad":""},
+  {"jornada":4,"local":"PAC","visita":"PUE","fecha":"2026-08-17","hora":"22:06","sede":"Estadio Hidalgo","ciudad":""},
+  {"jornada":5,"local":"LEO","visita":"MTY","fecha":"2026-08-21","hora":"20:00","sede":"Estadio León","ciudad":""},
+  {"jornada":5,"local":"TIG","visita":"ATE","fecha":"2026-08-21","hora":"20:00","sede":"Estadio Universitario UANL","ciudad":""},
+  {"jornada":5,"local":"JUA","visita":"AME","fecha":"2026-08-21","hora":"21:00","sede":"Estadio Olímpico Benito Juárez","ciudad":""},
+  {"jornada":5,"local":"QRO","visita":"TOL","fecha":"2026-08-21","hora":"22:10","sede":"Estadio La Corregidora","ciudad":""},
+  {"jornada":5,"local":"GDL","visita":"TIJ","fecha":"2026-08-22","hora":"18:07","sede":"Estadio Akron","ciudad":""},
+  {"jornada":5,"local":"PUE","visita":"SAN","fecha":"2026-08-22","hora":"20:00","sede":"Estadio Cuauhtémoc","ciudad":""},
+  {"jornada":5,"local":"CAZ","visita":"ATL","fecha":"2026-08-22","hora":"22:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":5,"local":"ASL","visita":"PAC","fecha":"2026-08-23","hora":"18:00","sede":"Estadio Alfonso Lastras Ramírez","ciudad":""},
+  {"jornada":5,"local":"PUM","visita":"NEC","fecha":"2026-08-23","hora":"20:00","sede":"Estadio Olímpico Universitario","ciudad":""},
+  {"jornada":6,"local":"NEC","visita":"CAZ","fecha":"2026-08-28","hora":"19:00","sede":"Estadio Victoria","ciudad":""},
+  {"jornada":6,"local":"ATE","visita":"LEO","fecha":"2026-08-28","hora":"19:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":6,"local":"TIJ","visita":"PUM","fecha":"2026-08-28","hora":"21:00","sede":"Estadio Caliente","ciudad":""},
+  {"jornada":6,"local":"ATL","visita":"QRO","fecha":"2026-08-29","hora":"17:00","sede":"Estadio Jalisco","ciudad":""},
+  {"jornada":6,"local":"PAC","visita":"GDL","fecha":"2026-08-29","hora":"17:00","sede":"Estadio Hidalgo","ciudad":""},
+  {"jornada":6,"local":"AME","visita":"PUE","fecha":"2026-08-29","hora":"19:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":6,"local":"SAN","visita":"TIG","fecha":"2026-08-29","hora":"21:00","sede":"Estadio Corona","ciudad":""},
+  {"jornada":6,"local":"TOL","visita":"JUA","fecha":"2026-08-30","hora":"18:00","sede":"Estadio Nemesio Díez","ciudad":""},
+  {"jornada":6,"local":"MTY","visita":"ASL","fecha":"2026-08-30","hora":"20:00","sede":"Estadio BBVA","ciudad":""},
+  {"jornada":7,"local":"PUE","visita":"TOL","fecha":"2026-09-04","hora":"19:00","sede":"Estadio Cuauhtémoc","ciudad":""},
+  {"jornada":7,"local":"JUA","visita":"PAC","fecha":"2026-09-04","hora":"21:00","sede":"Estadio Olímpico Benito Juárez","ciudad":""},
+  {"jornada":7,"local":"QRO","visita":"MTY","fecha":"2026-09-05","hora":"17:00","sede":"Estadio La Corregidora","ciudad":""},
+  {"jornada":7,"local":"ASL","visita":"GDL","fecha":"2026-09-05","hora":"17:00","sede":"Estadio Alfonso Lastras Ramírez","ciudad":""},
+  {"jornada":7,"local":"TIG","visita":"NEC","fecha":"2026-09-05","hora":"19:00","sede":"Estadio Universitario UANL","ciudad":""},
+  {"jornada":7,"local":"AME","visita":"TIJ","fecha":"2026-09-05","hora":"19:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":7,"local":"ATL","visita":"ATE","fecha":"2026-09-05","hora":"21:00","sede":"Estadio Jalisco","ciudad":""},
+  {"jornada":7,"local":"PUM","visita":"LEO","fecha":"2026-09-06","hora":"12:00","sede":"Estadio Olímpico Universitario","ciudad":""},
+  {"jornada":7,"local":"CAZ","visita":"SAN","fecha":"2026-09-06","hora":"20:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":8,"local":"NEC","visita":"PUE","fecha":"2026-09-11","hora":"19:00","sede":"Estadio Victoria","ciudad":""},
+  {"jornada":8,"local":"TIJ","visita":"QRO","fecha":"2026-09-11","hora":"21:00","sede":"Estadio Caliente","ciudad":""},
+  {"jornada":8,"local":"ATE","visita":"PAC","fecha":"2026-09-11","hora":"21:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":8,"local":"LEO","visita":"ASL","fecha":"2026-09-12","hora":"17:00","sede":"Estadio León","ciudad":""},
+  {"jornada":8,"local":"TOL","visita":"ATL","fecha":"2026-09-12","hora":"19:00","sede":"Estadio Nemesio Díez","ciudad":""},
+  {"jornada":8,"local":"CAZ","visita":"AME","fecha":"2026-09-12","hora":"19:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":8,"local":"SAN","visita":"JUA","fecha":"2026-09-13","hora":"18:00","sede":"Estadio Corona","ciudad":""},
+  {"jornada":8,"local":"GDL","visita":"PUM","fecha":"2026-09-13","hora":"18:07","sede":"Estadio Akron","ciudad":""},
+  {"jornada":8,"local":"MTY","visita":"TIG","fecha":"2026-09-13","hora":"20:00","sede":"Estadio BBVA","ciudad":""},
+  {"jornada":9,"local":"PUE","visita":"ATE","fecha":"2026-09-18","hora":"19:00","sede":"Estadio Cuauhtémoc","ciudad":""},
+  {"jornada":9,"local":"JUA","visita":"TIG","fecha":"2026-09-18","hora":"21:00","sede":"Estadio Olímpico Benito Juárez","ciudad":""},
+  {"jornada":9,"local":"ATL","visita":"PUM","fecha":"2026-09-19","hora":"17:00","sede":"Estadio Jalisco","ciudad":""},
+  {"jornada":9,"local":"ASL","visita":"NEC","fecha":"2026-09-19","hora":"17:00","sede":"Estadio Alfonso Lastras Ramírez","ciudad":""},
+  {"jornada":9,"local":"MTY","visita":"CAZ","fecha":"2026-09-19","hora":"19:00","sede":"Estadio BBVA","ciudad":""},
+  {"jornada":9,"local":"AME","visita":"GDL","fecha":"2026-09-19","hora":"21:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":9,"local":"TOL","visita":"SAN","fecha":"2026-09-20","hora":"18:00","sede":"Estadio Nemesio Díez","ciudad":""},
+  {"jornada":9,"local":"PAC","visita":"TIJ","fecha":"2026-09-20","hora":"18:00","sede":"Estadio Hidalgo","ciudad":""},
+  {"jornada":9,"local":"QRO","visita":"LEO","fecha":"2026-09-20","hora":"20:00","sede":"Estadio La Corregidora","ciudad":""},
+  {"jornada":10,"local":"ATE","visita":"MTY","fecha":"2026-09-25","hora":"19:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":10,"local":"TIJ","visita":"ATL","fecha":"2026-09-25","hora":"21:00","sede":"Estadio Caliente","ciudad":""},
+  {"jornada":10,"local":"GDL","visita":"QRO","fecha":"2026-09-26","hora":"17:07","sede":"Estadio Akron","ciudad":""},
+  {"jornada":10,"local":"TIG","visita":"PUE","fecha":"2026-09-26","hora":"19:00","sede":"Estadio Universitario UANL","ciudad":""},
+  {"jornada":10,"local":"SAN","visita":"PAC","fecha":"2026-09-26","hora":"19:00","sede":"Estadio Corona","ciudad":""},
+  {"jornada":10,"local":"CAZ","visita":"TOL","fecha":"2026-09-26","hora":"21:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":10,"local":"PUM","visita":"ASL","fecha":"2026-09-27","hora":"12:00","sede":"Estadio Olímpico Universitario","ciudad":""},
+  {"jornada":10,"local":"LEO","visita":"JUA","fecha":"2026-09-27","hora":"19:00","sede":"Estadio León","ciudad":""},
+  {"jornada":10,"local":"NEC","visita":"AME","fecha":"2026-09-27","hora":"21:00","sede":"Estadio Victoria","ciudad":""},
+  {"jornada":11,"local":"QRO","visita":"ATE","fecha":"2026-10-09","hora":"19:00","sede":"Estadio La Corregidora","ciudad":""},
+  {"jornada":11,"local":"PUE","visita":"LEO","fecha":"2026-10-09","hora":"19:00","sede":"Estadio Cuauhtémoc","ciudad":""},
+  {"jornada":11,"local":"TIG","visita":"TOL","fecha":"2026-10-09","hora":"21:00","sede":"Estadio Universitario UANL","ciudad":""},
+  {"jornada":11,"local":"JUA","visita":"TIJ","fecha":"2026-10-10","hora":"17:00","sede":"Estadio Olímpico Benito Juárez","ciudad":""},
+  {"jornada":11,"local":"ATL","visita":"GDL","fecha":"2026-10-10","hora":"19:00","sede":"Estadio Jalisco","ciudad":""},
+  {"jornada":11,"local":"AME","visita":"MTY","fecha":"2026-10-10","hora":"21:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":11,"local":"PAC","visita":"NEC","fecha":"2026-10-11","hora":"17:00","sede":"Estadio Hidalgo","ciudad":""},
+  {"jornada":11,"local":"ASL","visita":"SAN","fecha":"2026-10-11","hora":"17:00","sede":"Estadio Alfonso Lastras Ramírez","ciudad":""},
+  {"jornada":11,"local":"PUM","visita":"CAZ","fecha":"2026-10-11","hora":"19:00","sede":"Estadio Olímpico Universitario","ciudad":""},
+  {"jornada":12,"local":"NEC","visita":"ATL","fecha":"2026-10-16","hora":"19:00","sede":"Estadio Victoria","ciudad":""},
+  {"jornada":12,"local":"TIJ","visita":"PUE","fecha":"2026-10-16","hora":"21:00","sede":"Estadio Caliente","ciudad":""},
+  {"jornada":12,"local":"ATE","visita":"PUM","fecha":"2026-10-16","hora":"21:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":12,"local":"SAN","visita":"QRO","fecha":"2026-10-17","hora":"17:00","sede":"Estadio Corona","ciudad":""},
+  {"jornada":12,"local":"GDL","visita":"TIG","fecha":"2026-10-17","hora":"17:07","sede":"Estadio Akron","ciudad":""},
+  {"jornada":12,"local":"TOL","visita":"ASL","fecha":"2026-10-17","hora":"19:00","sede":"Estadio Nemesio Díez","ciudad":""},
+  {"jornada":12,"local":"LEO","visita":"AME","fecha":"2026-10-17","hora":"19:00","sede":"Estadio León","ciudad":""},
+  {"jornada":12,"local":"CAZ","visita":"JUA","fecha":"2026-10-17","hora":"21:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":12,"local":"MTY","visita":"PAC","fecha":"2026-10-18","hora":"19:00","sede":"Estadio BBVA","ciudad":""},
+  {"jornada":13,"local":"JUA","visita":"ATE","fecha":"2026-10-20","hora":"19:00","sede":"Estadio Olímpico Benito Juárez","ciudad":""},
+  {"jornada":13,"local":"ASL","visita":"QRO","fecha":"2026-10-20","hora":"19:00","sede":"Estadio Alfonso Lastras Ramírez","ciudad":""},
+  {"jornada":13,"local":"TIG","visita":"LEO","fecha":"2026-10-20","hora":"21:00","sede":"Estadio Universitario UANL","ciudad":""},
+  {"jornada":13,"local":"GDL","visita":"NEC","fecha":"2026-10-20","hora":"21:07","sede":"Estadio Akron","ciudad":""},
+  {"jornada":13,"local":"TOL","visita":"TIJ","fecha":"2026-10-21","hora":"19:00","sede":"Estadio Nemesio Díez","ciudad":""},
+  {"jornada":13,"local":"ATL","visita":"AME","fecha":"2026-10-21","hora":"19:00","sede":"Estadio Jalisco","ciudad":""},
+  {"jornada":13,"local":"PUE","visita":"MTY","fecha":"2026-10-21","hora":"19:00","sede":"Estadio Cuauhtémoc","ciudad":""},
+  {"jornada":13,"local":"SAN","visita":"PUM","fecha":"2026-10-21","hora":"21:00","sede":"Estadio Corona","ciudad":""},
+  {"jornada":13,"local":"PAC","visita":"CAZ","fecha":"2026-10-21","hora":"21:00","sede":"Estadio Hidalgo","ciudad":""},
+  {"jornada":14,"local":"NEC","visita":"JUA","fecha":"2026-10-23","hora":"19:00","sede":"Estadio Victoria","ciudad":""},
+  {"jornada":14,"local":"ATE","visita":"ASL","fecha":"2026-10-23","hora":"21:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":14,"local":"LEO","visita":"TOL","fecha":"2026-10-24","hora":"17:00","sede":"Estadio León","ciudad":""},
+  {"jornada":14,"local":"MTY","visita":"GDL","fecha":"2026-10-24","hora":"18:00","sede":"Estadio BBVA","ciudad":""},
+  {"jornada":14,"local":"PUM","visita":"TIG","fecha":"2026-10-24","hora":"21:00","sede":"Estadio Olímpico Universitario","ciudad":""},
+  {"jornada":14,"local":"ATL","visita":"PUE","fecha":"2026-10-25","hora":"17:00","sede":"Estadio Jalisco","ciudad":""},
+  {"jornada":14,"local":"AME","visita":"PAC","fecha":"2026-10-25","hora":"17:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":14,"local":"QRO","visita":"CAZ","fecha":"2026-10-25","hora":"19:00","sede":"Estadio La Corregidora","ciudad":""},
+  {"jornada":14,"local":"TIJ","visita":"SAN","fecha":"2026-10-25","hora":"21:00","sede":"Estadio Caliente","ciudad":""},
+  {"jornada":15,"local":"JUA","visita":"QRO","fecha":"2026-10-30","hora":"19:00","sede":"Estadio Olímpico Benito Juárez","ciudad":""},
+  {"jornada":15,"local":"ASL","visita":"ATL","fecha":"2026-10-30","hora":"19:00","sede":"Estadio Alfonso Lastras Ramírez","ciudad":""},
+  {"jornada":15,"local":"PUE","visita":"PUM","fecha":"2026-10-30","hora":"21:00","sede":"Estadio Cuauhtémoc","ciudad":""},
+  {"jornada":15,"local":"PAC","visita":"TIG","fecha":"2026-10-31","hora":"17:00","sede":"Estadio Hidalgo","ciudad":""},
+  {"jornada":15,"local":"MTY","visita":"TIJ","fecha":"2026-10-31","hora":"19:00","sede":"Estadio BBVA","ciudad":""},
+  {"jornada":15,"local":"GDL","visita":"ATE","fecha":"2026-10-31","hora":"19:07","sede":"Estadio Akron","ciudad":""},
+  {"jornada":15,"local":"AME","visita":"TOL","fecha":"2026-10-31","hora":"21:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":15,"local":"SAN","visita":"NEC","fecha":"2026-11-01","hora":"17:00","sede":"Estadio Corona","ciudad":""},
+  {"jornada":15,"local":"CAZ","visita":"LEO","fecha":"2026-11-01","hora":"19:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":16,"local":"NEC","visita":"TIJ","fecha":"2026-11-06","hora":"19:00","sede":"Estadio Victoria","ciudad":""},
+  {"jornada":16,"local":"ASL","visita":"JUA","fecha":"2026-11-06","hora":"19:00","sede":"Estadio Alfonso Lastras Ramírez","ciudad":""},
+  {"jornada":16,"local":"ATE","visita":"SAN","fecha":"2026-11-06","hora":"21:00","sede":"Estadio Azteca","ciudad":""},
+  {"jornada":16,"local":"TIG","visita":"CAZ","fecha":"2026-11-07","hora":"17:00","sede":"Estadio Universitario UANL","ciudad":""},
+  {"jornada":16,"local":"ATL","visita":"PAC","fecha":"2026-11-07","hora":"17:00","sede":"Estadio Jalisco","ciudad":""},
+  {"jornada":16,"local":"TOL","visita":"MTY","fecha":"2026-11-07","hora":"19:00","sede":"Estadio Nemesio Díez","ciudad":""},
+  {"jornada":16,"local":"PUM","visita":"AME","fecha":"2026-11-07","hora":"21:00","sede":"Estadio Olímpico Universitario","ciudad":""},
+  {"jornada":16,"local":"QRO","visita":"PUE","fecha":"2026-11-08","hora":"18:00","sede":"Estadio La Corregidora","ciudad":""},
+  {"jornada":16,"local":"LEO","visita":"GDL","fecha":"2026-11-08","hora":"20:00","sede":"Estadio León","ciudad":""},
+  {"jornada":17,"local":"PUE","visita":"ASL","fecha":"2026-11-20","hora":"19:00","sede":"Estadio Cuauhtémoc","ciudad":""},
+  {"jornada":17,"local":"TIJ","visita":"ATE","fecha":"2026-11-20","hora":"21:00","sede":"Estadio Caliente","ciudad":""},
+  {"jornada":17,"local":"JUA","visita":"ATL","fecha":"2026-11-20","hora":"21:00","sede":"Estadio Olímpico Benito Juárez","ciudad":""},
+  {"jornada":17,"local":"SAN","visita":"LEO","fecha":"2026-11-21","hora":"17:00","sede":"Estadio Corona","ciudad":""},
+  {"jornada":17,"local":"PAC","visita":"TOL","fecha":"2026-11-21","hora":"17:00","sede":"Estadio Hidalgo","ciudad":""},
+  {"jornada":17,"local":"PUM","visita":"MTY","fecha":"2026-11-21","hora":"19:00","sede":"Estadio Olímpico Universitario","ciudad":""},
+  {"jornada":17,"local":"TIG","visita":"AME","fecha":"2026-11-21","hora":"21:00","sede":"Estadio Universitario UANL","ciudad":""},
+  {"jornada":17,"local":"GDL","visita":"CAZ","fecha":"2026-11-22","hora":"17:07","sede":"Estadio Akron","ciudad":""},
+  {"jornada":17,"local":"QRO","visita":"NEC","fecha":"2026-11-22","hora":"19:00","sede":"Estadio La Corregidora","ciudad":""}
+];
 
 /* ╔══════════════════════════════════════════════════════════╗
    ║  BLOQUE C — PROVEEDOR DE DATOS                           ║
@@ -422,6 +579,13 @@ const FUENTE = {
     "Toluca":"TOL","Pachuca":"PAC","Necaxa":"NEC","Puebla":"PUE","Atlante":"ATE"
   },
 
+  /* El proveedor manda un mismo inmueble con nombres distintos según
+     la jornada. Aquí se fija el nombre bueno, así las sincronizaciones
+     futuras no reviven el viejo. */
+  sedeAlias:{
+    "Estadio Banorte":"Estadio Azteca"
+  },
+
   normalizar(json){
     const eventos = (json && json.events) || [];
     const salida = [];
@@ -432,12 +596,12 @@ const FUENTE = {
       if (!jornada || jornada < 1 || jornada > TORNEO.jornadas) return;  // fuera: liguilla o amistosos
       const marcado = e.intHomeScore !== null && e.intHomeScore !== undefined &&
                       e.intAwayScore !== null && e.intAwayScore !== undefined;
+      const cuando = this.cuando(e);
       salida.push({
         jornada, local, visita,
-        // dateEvent y strTime vienen en UTC; los *Local son la hora de cancha
-        fecha: e.dateEventLocal || e.dateEvent || "",
-        hora:  (e.strTimeLocal || e.strTime || "").slice(0, 5),
-        sede:  e.strVenue || "",
+        fecha: cuando.fecha,
+        hora:  cuando.hora,
+        sede:  this.aSede(e.strVenue),
         ciudad:"",                       // el proveedor no manda ciudad, solo pais
         pospuesto: e.strPostponed === "yes",
         gl: marcado ? +e.intHomeScore : null,
@@ -445,6 +609,53 @@ const FUENTE = {
       });
     });
     return salida;
+  },
+
+  /* Fecha y hora de cancha. Los campos *Local sólo vienen llenos en
+     partidos ya jugados; en los futuros dateEvent y strTime están en
+     UTC, así que se traduce strTimestamp al horario del centro de
+     México. Fecha y hora se resuelven juntas: al cruzar la medianoche
+     UTC también cambia el día. */
+  cuando(e){
+    const fechaLocal = e.dateEventLocal || "";
+    const horaLocal  = (e.strTimeLocal || "").slice(0, 5);
+    if (fechaLocal && horaLocal) return {fecha:fechaLocal, hora:horaLocal};
+
+    const mx = this.aHoraMexico(e.strTimestamp);
+    if (mx) return mx;
+
+    return {fecha: fechaLocal || e.dateEvent || "",
+            hora:  horaLocal || (e.strTime || "").slice(0, 5)};
+  },
+
+  aHoraMexico(ts){
+    if (!ts) return null;
+    let s = String(ts).trim().replace(" ", "T");
+    if (!/(Z|[+-]\d\d:?\d\d)$/i.test(s)) s += "Z";   // sin huso explícito el motor lo leería como hora local
+    const d = new Date(s);
+    if (isNaN(d)) return null;
+    let p;
+    try {
+      p = new Intl.DateTimeFormat("en-CA", {
+        timeZone:"America/Mexico_City", hourCycle:"h23",
+        year:"numeric", month:"2-digit", day:"2-digit",
+        hour:"2-digit", minute:"2-digit"
+      }).formatToParts(d).reduce((a, x) => (a[x.type] = x.value, a), {});
+    } catch(_){ return null; }
+    if (!p.year || !p.hour) return null;
+    const dd = v => String(v).padStart(2, "0");
+    return {
+      fecha: p.year + "-" + dd(p.month) + "-" + dd(p.day),
+      hora:  dd(p.hour === "24" ? "00" : p.hour) + ":" + dd(p.minute)
+    };
+  },
+
+  aSede(n){
+    if (!n) return "";
+    if (this.sedeAlias[n]) return this.sedeAlias[n];
+    const limpio = norm(n);
+    for (const k in this.sedeAlias) if (norm(k) === limpio) return this.sedeAlias[k];
+    return n;
   },
 
   aId(n){
@@ -584,7 +795,12 @@ function agruparEnJornadas(lista){
 
 function construirCalendario(){
   const g = almacen.leer();
-  if (g && g.calendario && g.calendario.length){
+  const hayGuardado = !!(g && g.calendario && g.calendario.length);
+  // una copia sin versión es anterior al versionado: también caduca
+  const vigente = hayGuardado &&
+                  (g.calendarioVersion || 0) >= TORNEO.calendarioVersion;
+
+  if (vigente){
     estado.calendario = g.calendario;
     estado.oficial = !!g.oficial;
     estado.sincronizado = g.sincronizado || null;
@@ -596,10 +812,40 @@ function construirCalendario(){
     estado.calendario = calendarioGenerado();
     estado.oficial = false;
   }
-  if (g && g.resultados){
-    estado.resultados = g.resultados;
-    estado.series = g.series || {};
+
+  if (vigente){
+    if (g.resultados){
+      estado.resultados = g.resultados;
+      estado.series = g.series || {};
+      estado.jornadaActiva = g.jornadaActiva || 0;
+    }
+  } else if (hayGuardado){
+    // El calendario guardado caducó. Sus marcadores están indexados
+    // contra el orden viejo, así que no se pueden copiar tal cual: se
+    // rescatan por par de equipos, igual que al importar. Lo anotado a
+    // mano y lo ya jugado sobreviven; lo del motor se descarta, porque
+    // es invención suya y la vuelve a hacer cuando se le pida.
+    const mios = {};
+    (g.calendario || []).forEach((ronda, j) => (ronda || []).forEach((pt, i) => {
+      const r = (g.resultados || {})[idPartido(j, i)];
+      if (r && (r.origen === "manual" || r.origen === "real"))
+        mios[[pt.local, pt.visita].sort().join("|")] = {r:r, local:pt.local};
+    }));
+
+    estado.resultados = {};
+    estado.calendario.forEach((ronda, j) => ronda.forEach((pt, i) => {
+      const v = mios[[pt.local, pt.visita].sort().join("|")];
+      if (!v) return;
+      // un marcador real describe lo que pasó en la cancha: si el
+      // calendario nuevo invierte la casa, los goles se voltean con él
+      const voltear = v.r.origen === "real" && v.local !== pt.local;
+      estado.resultados[idPartido(j, i)] = voltear
+        ? {gl:v.r.gv, gv:v.r.gl, origen:"real"} : v.r;
+    }));
+
     estado.jornadaActiva = g.jornadaActiva || 0;
+    invalidar();   // la liguilla salía del calendario viejo
+    guardar();     // sella la versión nueva: la mudanza se hace una vez
   }
 }
 
@@ -607,6 +853,7 @@ function guardar(){
   almacen.escribir({
     resultados:estado.resultados, series:estado.series,
     jornadaActiva:estado.jornadaActiva, calendario:estado.calendario,
+    calendarioVersion:TORNEO.calendarioVersion,
     oficial:estado.oficial, sincronizado:estado.sincronizado,
     parcial:estado.parcial, traidos:estado.traidos
   });
@@ -854,11 +1101,13 @@ function importarCalendario(){
   if (malos.length)
     return avisoTaller(malos.length + " partidos con equipos desconocidos.", true);
 
-  // conserva lo que ya habías anotado, buscándolo por par de equipos
+  // conserva lo anotado a mano y lo ya jugado, buscándolo por par de
+  // equipos. Lo del motor no: es invención suya y se rehace sola.
   const mios = {};
   estado.calendario.forEach((ronda, j) => ronda.forEach((pt, i) => {
     const r = estado.resultados[idPartido(j, i)];
-    if (r && r.origen === "manual") mios[[pt.local, pt.visita].sort().join("|")] = r;
+    if (r && (r.origen === "manual" || r.origen === "real"))
+      mios[[pt.local, pt.visita].sort().join("|")] = {r:r, local:pt.local};
   }));
 
   estado.calendario = agruparEnJornadas(datos);
@@ -867,15 +1116,22 @@ function importarCalendario(){
   estado.traidos = datos.length;
   estado.resultados = {};
 
-  let recuperados = 0;
+  let recuperados = 0, reales = 0;
   estado.calendario.forEach((ronda, j) => ronda.forEach((pt, i) => {
-    const k = [pt.local, pt.visita].sort().join("|");
-    if (mios[k]){ estado.resultados[idPartido(j, i)] = mios[k]; recuperados++; }
+    const v = mios[[pt.local, pt.visita].sort().join("|")];
+    if (!v) return;
+    // un marcador real describe lo que pasó en la cancha: si el
+    // calendario nuevo invierte la casa, los goles se voltean con él
+    const voltear = v.r.origen === "real" && v.local !== pt.local;
+    estado.resultados[idPartido(j, i)] = voltear
+      ? {gl:v.r.gv, gv:v.r.gl, origen:"real"} : v.r;
+    if (v.r.origen === "real") reales++; else recuperados++;
   }));
 
   invalidar(); guardar(); pintar();
   avisoTaller("Cargados " + datos.length + " partidos" +
-    (recuperados ? " · " + recuperados + " predicciones tuyas conservadas" : "") + ".");
+    (recuperados ? " · " + recuperados + " predicciones tuyas conservadas" : "") +
+    (reales ? " · " + reales + " jugados conservados" : "") + ".");
 }
 
 function avisoTaller(txt, mal){
