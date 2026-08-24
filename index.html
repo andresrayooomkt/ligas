@@ -169,6 +169,17 @@ main{max-width:var(--max);margin:0 auto;padding:22px 16px 70px}
 .agg{font-family:var(--f-data);font-weight:700}
 .tie-note{font-family:var(--f-data);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
   color:var(--ink-soft);margin-top:6px;padding-top:6px;border-top:1px dashed var(--rule)}
+.taller{margin-top:34px;padding-top:14px;border-top:1px dashed var(--rule)}
+.taller h3{font-family:var(--f-data);font-size:.6rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ink-soft);font-weight:400;margin-bottom:8px}
+.taller p{font-size:.78rem;color:var(--ink-soft);margin-bottom:9px;max-width:60ch}
+.taller-btns{display:flex;gap:7px;flex-wrap:wrap}
+.taller textarea{width:100%;min-height:150px;margin-top:10px;padding:10px;
+  font-family:var(--f-data);font-size:.7rem;line-height:1.5;
+  background:var(--paper-2);color:var(--ink);border:1.5px solid var(--rule);resize:vertical}
+.taller-msg{font-family:var(--f-data);font-size:.62rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--green);margin-top:8px;min-height:1em}
+.taller-msg.mal{color:var(--red)}
 .empty{border:2px dashed var(--rule);padding:26px 16px;text-align:center;
   color:var(--ink-soft);font-size:.9rem}
 
@@ -382,10 +393,23 @@ const FUENTE = {
   ligaId:"4350",
   temporada:"2026-2027",
 
+  // temporada completa: una sola llamada, pero la llave gratuita
+  // la corta a 15 eventos
   url(){
     return "https://www.thesportsdb.com/api/v1/json/" + this.llave +
            "/eventsseason.php?id=" + this.ligaId + "&s=" + this.temporada;
   },
+
+  // una jornada a la vez: esquiva el tope de 15 porque cada fecha
+  // trae 9 partidos. Son 17 llamadas, se hacen una sola vez.
+  urlJornada(r){
+    return "https://www.thesportsdb.com/api/v1/json/" + this.llave +
+           "/eventsround.php?id=" + this.ligaId + "&r=" + r + "&s=" + this.temporada;
+  },
+
+  porJornada:true,   // false = una sola llamada de temporada
+  pausaMs:350,       // respiro entre llamadas para no saturar la llave compartida
+
 
   alias:{
     "Club America":"AME","America":"AME","Club Leon":"LEO","Leon":"LEO",
@@ -505,6 +529,8 @@ const nombre = id => club(id) ? club(id).nombre : "—";
 const corto  = id => club(id) ? (club(id).corto || club(id).nombre) : "—";
 const idPartido = (j, i) => "J" + j + "-" + i;
 const totalPartidos = () => estado.calendario.reduce((s, r) => s + r.length, 0);
+// cuantos DEBERIA haber segun el formato, independiente de lo que trajo el proveedor
+const esperados = () => TORNEO.jornadas * (TORNEO.clubes.length / 2);
 
 function chip(id, grande){
   const c = club(id); if (!c) return "";
@@ -622,8 +648,8 @@ function tablaGeneral(){
                        || nombre(a.id).localeCompare(nombre(b.id)));
   return lista;
 }
-const completa = () => totalPartidos() > 0 &&
-  Object.keys(estado.resultados).length >= totalPartidos();
+const completa = () => totalPartidos() >= esperados() &&
+  Object.keys(estado.resultados).length >= esperados();
 
 function emparejar(eq){
   const o = eq.slice().sort((a, b) => a.pos - b.pos), pares = [];
@@ -702,9 +728,34 @@ async function sincronizar(){
   const etiqueta = btn.textContent;
   btn.disabled = true; btn.textContent = "Actualizando…";
   try{
-    const resp = await fetch(FUENTE.url(), {cache:"no-store"});
-    if (!resp.ok) throw new Error("HTTP " + resp.status);
-    const lista = FUENTE.normalizar(await resp.json());
+    let lista = [];
+
+    if (FUENTE.porJornada){
+      // 17 llamadas, una por fecha, mostrando el avance
+      for (let r = 1; r <= TORNEO.jornadas; r++){
+        btn.textContent = "Jornada " + r + "/" + TORNEO.jornadas;
+        try{
+          const rr = await fetch(FUENTE.urlJornada(r), {cache:"no-store"});
+          if (rr.ok) lista = lista.concat(FUENTE.normalizar(await rr.json()));
+        }catch(e){
+          console.warn("jornada " + r + " no se pudo traer:", e);
+        }
+        if (r < TORNEO.jornadas) await new Promise(ok => setTimeout(ok, FUENTE.pausaMs));
+      }
+    } else {
+      const resp = await fetch(FUENTE.url(), {cache:"no-store"});
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      lista = FUENTE.normalizar(await resp.json());
+    }
+
+    // el proveedor puede repetir un partido entre llamadas
+    const vistos = new Set();
+    lista = lista.filter(p => {
+      const k = p.jornada + "|" + [p.local, p.visita].sort().join("-");
+      if (vistos.has(k)) return false;
+      vistos.add(k); return true;
+    });
+
     if (!lista.length) throw new Error("sin partidos");
 
     const nuevo = agruparEnJornadas(lista);
@@ -739,8 +790,7 @@ async function sincronizar(){
     }));
 
     // El plan gratuito trunca la respuesta: si faltan jornadas, avisalo
-    const esperados = TORNEO.jornadas * (TORNEO.clubes.length / 2);
-    estado.parcial = lista.length < esperados;
+    estado.parcial = lista.length < esperados();
     estado.traidos = lista.length;
 
     invalidar(); guardar(); pintar();
@@ -752,6 +802,87 @@ async function sincronizar(){
   }finally{
     setTimeout(() => { btn.disabled = false; btn.textContent = etiqueta; }, 2600);
   }
+}
+
+/* ══════════════════════════════════════════════════════════
+   TALLER — herramientas para ti, no para el usuario final.
+   Exportar deja el calendario listo para pegarlo en el
+   BLOQUE B: ahí viaja dentro del archivo y le llega a todos,
+   en vez de vivir solo en tu navegador.
+   ══════════════════════════════════════════════════════════ */
+function calendarioComoTexto(){
+  const plano = [];
+  estado.calendario.forEach((ronda, j) => ronda.forEach(pt => {
+    plano.push({
+      jornada:j + 1, local:pt.local, visita:pt.visita,
+      fecha:pt.fecha || "", hora:pt.hora || "",
+      sede:pt.sede || "", ciudad:pt.ciudad || ""
+    });
+  }));
+  return plano.map(p => "  " + JSON.stringify(p)).join(",\n");
+}
+
+function exportarCalendario(){
+  const caja = document.getElementById("caja-cal");
+  if (!caja) return;
+  caja.value = "[\n" + calendarioComoTexto() + "\n]";
+  caja.style.display = "block";
+  caja.select();
+  let ok = false;
+  try{ ok = document.execCommand("copy"); }catch(e){}
+  if (!ok && navigator.clipboard) navigator.clipboard.writeText(caja.value).catch(() => {});
+  const n = estado.calendario.reduce((a, r) => a + r.length, 0);
+  avisoTaller("Copiado: " + n + " partidos. Pégalo en CALENDARIO_OFICIAL del bloque B.");
+}
+
+function importarCalendario(){
+  const caja = document.getElementById("caja-cal");
+  if (!caja) return;
+  if (caja.style.display !== "block"){
+    caja.style.display = "block"; caja.value = ""; caja.focus();
+    avisoTaller("Pega aquí el arreglo y vuelve a darle a Cargar.");
+    return;
+  }
+  let datos;
+  try{ datos = JSON.parse(caja.value); }
+  catch(e){ return avisoTaller("Eso no es JSON válido.", true); }
+  if (!Array.isArray(datos) || !datos.length)
+    return avisoTaller("Se esperaba un arreglo de partidos.", true);
+
+  const ids = new Set(TORNEO.clubes.map(c => c.id));
+  const malos = datos.filter(p => !ids.has(p.local) || !ids.has(p.visita));
+  if (malos.length)
+    return avisoTaller(malos.length + " partidos con equipos desconocidos.", true);
+
+  // conserva lo que ya habías anotado, buscándolo por par de equipos
+  const mios = {};
+  estado.calendario.forEach((ronda, j) => ronda.forEach((pt, i) => {
+    const r = estado.resultados[idPartido(j, i)];
+    if (r && r.origen === "manual") mios[[pt.local, pt.visita].sort().join("|")] = r;
+  }));
+
+  estado.calendario = agruparEnJornadas(datos);
+  estado.oficial = true;
+  estado.parcial = datos.length < esperados();
+  estado.traidos = datos.length;
+  estado.resultados = {};
+
+  let recuperados = 0;
+  estado.calendario.forEach((ronda, j) => ronda.forEach((pt, i) => {
+    const k = [pt.local, pt.visita].sort().join("|");
+    if (mios[k]){ estado.resultados[idPartido(j, i)] = mios[k]; recuperados++; }
+  }));
+
+  invalidar(); guardar(); pintar();
+  avisoTaller("Cargados " + datos.length + " partidos" +
+    (recuperados ? " · " + recuperados + " predicciones tuyas conservadas" : "") + ".");
+}
+
+function avisoTaller(txt, mal){
+  const el = document.getElementById("taller-msg");
+  if (!el) return;
+  el.textContent = txt;
+  el.className = "taller-msg" + (mal ? " mal" : "");
 }
 
 function compartir(t){
@@ -790,9 +921,8 @@ const esc = s => String(s).replace(/[&<>"']/g, c =>
 
 function avisoCalendario(){
   if (estado.oficial && estado.parcial){
-    const esperados = TORNEO.jornadas * (TORNEO.clubes.length / 2);
     return `<div class="aviso"><strong>Calendario incompleto.</strong>
-      El proveedor devolvió ${estado.traidos} de ${esperados} partidos.
+      El proveedor devolvió ${estado.traidos} de ${esperados()} partidos.
       La llave gratuita corta la respuesta a 15 eventos; se necesita llave dedicada
       para el torneo completo.</div>`;
   }
@@ -803,7 +933,7 @@ function avisoCalendario(){
 }
 
 function vistaTabla(){
-  const t = tablaGeneral(), total = totalPartidos();
+  const t = tablaGeneral(), total = esperados();
   const n = Object.keys(estado.resultados).length;
   const goles = Object.values(estado.resultados).reduce((s, r) => s + r.gl + r.gv, 0);
   const mios = Object.values(estado.resultados).filter(r => r.origen === "manual").length;
@@ -828,7 +958,22 @@ function vistaTabla(){
       <td>${f.dg > 0 ? "+" : ""}${f.dg}</td><td class="pts">${f.pts}</td></tr>`;
   });
   return h + `</tbody></table>
-  <p class="legend"><span class="swatch"></span> Clasifican directo a la liguilla</p>`;
+  <p class="legend"><span class="swatch"></span> Clasifican directo a la liguilla</p>
+
+  <div class="taller">
+    <h3>Taller del calendario</h3>
+    <p>Copiar te da el calendario actual listo para pegarlo en
+    <strong>CALENDARIO_OFICIAL</strong> del bloque B. Ahí viaja dentro del archivo
+    y le llega a todo el que abra el sitio; lo que guarda el navegador solo existe
+    en este navegador.</p>
+    <div class="taller-btns">
+      <button class="mini" id="cal-exportar">Copiar calendario</button>
+      <button class="mini" id="cal-importar">Pegar y cargar</button>
+    </div>
+    <textarea id="caja-cal" style="display:none" spellcheck="false"
+      aria-label="Calendario en formato JSON"></textarea>
+    <p class="taller-msg" id="taller-msg"></p>
+  </div>`;
 }
 
 function vistaJornadas(){
@@ -880,10 +1025,11 @@ function vistaJornadas(){
 
 function vistaLiguilla(){
   if (!completa()){
-    const faltan = totalPartidos() - Object.keys(estado.resultados).length;
+    const faltan = esperados() - Object.keys(estado.resultados).length;
     return `<div class="section-head"><h2>Liguilla</h2></div>
       <div class="empty">Faltan <strong>${faltan}</strong> partidos de la fase regular.<br>
-      La liguilla se arma cuando la tabla esté cerrada.</div>`;
+      ${estado.parcial ? "El calendario está incompleto: primero usa Actualizar." :
+        "La liguilla se arma cuando la tabla esté cerrada."}</div>`;
   }
   const res = correrLiguilla(); let h = "";
   res.rondas.forEach(ronda => {
@@ -957,6 +1103,8 @@ document.addEventListener("click", e => {
     const [j, i] = t.dataset.borrar.split("-").map(Number);
     delete estado.resultados[idPartido(j, i)];
     invalidar(); guardar(); return pintar(); }
+  if (t.id === "cal-exportar")  return exportarCalendario();
+  if (t.id === "cal-importar")  return importarCalendario();
   if (t.id === "btn-tema")      return alternarTema();
   if (t.id === "btn-todo")      return simularTodo();
   if (t.id === "btn-reset")     return reiniciar();
